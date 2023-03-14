@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/Blank-c/PassView/components/chrome"
+	"github.com/Blank-c/PassView/components"
 )
 
 func main() {
-	passwords, err := chrome.GetPasswords()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, item := range passwords {
+	passwords := []components.PasswordModel{}
+
+	chromePasswords := make(chan []components.PasswordModel)
+	go components.GetChromePasswords(chromePasswords)
+
+	for _, item := range append(passwords, <-chromePasswords...) {
 		fmt.Printf("URL: %s\nUsername: %s\nPassword: %s\n\n", item.URL, item.Username, item.Password)
 	}
 }
